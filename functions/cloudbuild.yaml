@@ -1,0 +1,53 @@
+steps:
+  # 1) Install dependencies using `npm install` (not `npm ci`) to avoid lockfile mismatch errors
+  - name: 'node:18'
+    id: 'install-deps'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        set -e
+        echo "Installing dependencies with npm install (no-audit, no-fund)"
+        npm install --no-audit --no-fund
+
+  # 2) Build TypeScript to lib/
+  - name: 'node:18'
+    id: 'build'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        set -e
+        echo "Running tsc build"
+        npm run build
+
+  # 3) Deploy using gcloud. This step deploys the function named `api`.
+  #    It uses environment variable $PROJECT_ID supplied by Cloud Build.
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
+    id: 'deploy'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        set -e
+        echo "Deploying function 'api' to region asia-south1 (Gen 2)"
+        # If your function name or region differ, update the command below.
+        gcloud functions deploy api \
+          --project="$PROJECT_ID" \
+          --region=asia-south1 \
+          --gen2 \
+          --runtime=nodejs22 \
+          --source=. \
+          --trigger-http \
+          --entry-point=api \
+          --quiet
+
+timeout: '1200s'
+
+options:
+  machineType: 'E2_HIGHCPU_8'
+
+images: []
+
+substitutions:
+  _FUNCTION_NAME: 'api'
