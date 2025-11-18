@@ -1,6 +1,6 @@
 steps:
   # 1) Install dependencies using `npm install` (not `npm ci`) to avoid lockfile mismatch errors
-  - name: 'node:18'
+  - name: 'node:22'
     id: 'install-deps'
     entrypoint: 'bash'
     args:
@@ -11,7 +11,7 @@ steps:
         npm install --no-audit --no-fund
 
   # 2) Build TypeScript to lib/
-  - name: 'node:18'
+  - name: 'node:22'
     id: 'build'
     entrypoint: 'bash'
     args:
@@ -49,5 +49,4 @@ options:
 
 images: []
 
-substitutions:
-  _FUNCTION_NAME: 'api'
+# No custom substitutions required here; project is passed at build submission time.
