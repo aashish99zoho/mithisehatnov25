@@ -3,12 +3,15 @@ steps:
   - name: 'node:22'
     id: 'install-deps'
     entrypoint: 'bash'
+    env:
+      - 'NPM_CONFIG_CACHE=.npm'
     args:
       - '-c'
       - |
         set -e
-        echo "Installing dependencies with npm install (no-audit, no-fund)"
-        npm install --no-audit --no-fund
+        echo "Attempting npm ci (fallback to npm install)"
+        # prefer a clean install from package-lock, fall back to install if lockfile out of sync
+        npm ci --prefer-offline --no-audit --no-fund || npm install --no-audit --no-fund
 
   # 2) Build TypeScript to lib/
   - name: 'node:22'
@@ -45,7 +48,7 @@ steps:
 timeout: '1200s'
 
 options:
-  machineType: 'E2_HIGHCPU_8'
+  machineType: 'E2_HIGHCPU_16'
 
 images: []
 
