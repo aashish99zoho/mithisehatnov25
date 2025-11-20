@@ -47,9 +47,6 @@ steps:
 
 timeout: '1200s'
 
-options:
-  machineType: 'E2_HIGHCPU_16'
-
 images: []
 
 # No custom substitutions required here; project is passed at build submission time.
